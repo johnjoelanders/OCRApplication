@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -93,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     inputStream = getContentResolver().openInputStream(imageUri);
                     Bitmap image = BitmapFactory.decodeStream(inputStream);
-                    imageView.setImageBitmap(image);
+                    imageView.setImageBitmap(convertImageToGreyScale(image));
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                     Toast.makeText(this, "Cannot open image", Toast.LENGTH_SHORT).show();
@@ -105,6 +109,22 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
+    }
+    //Convert to greyscale
+    public Bitmap convertImageToGreyScale(Bitmap imageBitmap){
+        int widthOfImage,heightOfImage;
+        widthOfImage = imageBitmap.getWidth();
+        heightOfImage = imageBitmap.getHeight();
+
+        Bitmap bitmapGreyScale = Bitmap.createBitmap(widthOfImage,heightOfImage,Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmapGreyScale);
+        Paint paint = new Paint();
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.setSaturation(0);
+        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
+        paint.setColorFilter(filter);
+        canvas.drawBitmap(imageBitmap,0,0,paint);
+        return bitmapGreyScale;
     }
 
 }

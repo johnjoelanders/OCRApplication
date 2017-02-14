@@ -33,16 +33,6 @@
         android:layout_marginEnd="52dp"
         android:id="@+id/btnGallery" />
 
-    <Button
-        android:text="Convert"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
-        android:id="@+id/btnConvert"
-        android:layout_below="@+id/btnOpenCamera"
-        android:layout_toRightOf="@+id/btnOpenCamera"
-        android:layout_toEndOf="@+id/btnOpenCamera" />
-
     <ImageView
         android:layout_width="350dp"
         android:layout_height="300dp"
@@ -50,4 +40,13 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:id="@+id/imageView" />
+
+    <Button
+        android:text="Convert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnConvert"
+        android:layout_above="@+id/imageView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="12dp" />
 </RelativeLayout>
