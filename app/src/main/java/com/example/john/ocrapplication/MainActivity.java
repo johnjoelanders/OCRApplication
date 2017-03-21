@@ -222,20 +222,4 @@ public class MainActivity extends AppCompatActivity{
 
         return blackAndWhiteBitmap;
     }
-//     class OcrOperationAsync extends AsyncTask<Void,Void,String>{
-//
-//         @Override
-//         protected String doInBackground(Void... params) {
-//             try{
-//                 BitmapFactory.Options options = new BitmapFactory.Options();
-//                 options.inSampleSize = 4;
-//                 Bitmap bitmap = BitmapFactory.decodeFile(outputFileUri.getPath(), options);
-//                 result = extractText(bitmap);
-//             }catch(Exception e){
-//                 Log.e(TAG,"The error is "+e);
-//             }
-//             return result;
-//         }
-//     }
-
 }
