@@ -1,5 +1,6 @@
 package com.example.john.ocrapplication;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,8 +43,10 @@ public class MainActivity extends AppCompatActivity{
     Bitmap imageBitmap;
     private TessBaseAPI tessBaseApi;
     TextView textView;
-    static final int CONVERT = 1;
-
+    static final int CAM_REQUEST = 1;
+    static final int GALLERY_REQUEST = 2;
+    String IMGS_PATH = Environment.getExternalStorageDirectory().toString() + "/TesseractSample/imgs";
+    String img_path = IMGS_PATH + "/ocr.jpg";
     private static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/TesseractSample/";
     private static final String TESSDATA = "tessdata";
     private ProgressDialog mProgressDialog;
@@ -56,43 +61,83 @@ public class MainActivity extends AppCompatActivity{
         btnConvert = (Button) findViewById(R.id.btnConvert);
         textView = (TextView) findViewById(R.id.textResult);
 
+        if (btnCamera != null) {
+            btnCamera.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Intent camera_intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    File file = getFile();
+                    camera_intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+                    startActivityForResult(camera_intent, CAM_REQUEST);
+                }
+            });
+        }
+
+        if (btnGallery != null) {
+            btnGallery.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Intent photoFromGallery = new Intent(Intent.ACTION_PICK);
+
+                    File picturePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                    String picturePathAsString = picturePath.getPath();
+                    Uri data = Uri.parse(picturePathAsString);
+
+                    photoFromGallery.setDataAndType(data, "image/*");
+                    startActivityForResult(photoFromGallery, GALLERY_REQUEST);
+                }
+            });
+        }
         if (btnConvert != null) {
             btnConvert.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                        startCameraActivity();
-
+                    try{
+                        doOCR();
+                    }catch (Exception e){
+                        Log.e(TAG,"This is the exception we are failling "+e.toString());
+                        e.printStackTrace();
+                    }
                 }
             });
         }
     }
-    private void startCameraActivity(){
-        try {
-            String IMGS_PATH = Environment.getExternalStorageDirectory().toString() + "/TesseractSample/imgs";
-            prepareDirectory(IMGS_PATH);
-
-            String img_path = IMGS_PATH + "/ocr.jpg";
-
-            outputFileUri = Uri.fromFile(new File(img_path));
-
-            final Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, CONVERT);
-                imageBitmap = BitmapFactory.decodeFile(img_path);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
-    }
     public void onActivityResult(int requestCode, int resultCode,Intent data) {
-        if (requestCode == CONVERT) {
-            doOCR();
-        } else {
-            Toast.makeText(this, "ERROR: Image was not obtained.", Toast.LENGTH_SHORT).show();
+        switch(requestCode){
+            case GALLERY_REQUEST:
+                try {
+                    Uri imageUri = data.getData();
+                    InputStream in = getContentResolver().openInputStream(imageUri);
+                    OutputStream out = new FileOutputStream(img_path);
+
+                    byte[] buf = new byte[1024];
+                    int len;
+
+                    while ((len = in.read(buf)) > 0) {
+                        out.write(buf, 0, len);
+                    }
+                    in.close();
+                    out.close();
+                    imageBitmap = BitmapFactory.decodeFile(img_path);
+                    imageView.setImageBitmap(imageBitmap);
+
+                } catch (FileNotFoundException e) {
+                    Log.e(TAG, "ERROR: Connot open image "+ e );
+                }
+                catch (IOException e){
+                    Log.e(TAG, "ERROR: Connot open image "+ e );
+                }
+                break;
+            case CAM_REQUEST:
+                prepareDirectory(IMGS_PATH);
+                outputFileUri = Uri.fromFile(new File(img_path));
+                imageBitmap = BitmapFactory.decodeFile(img_path);
+                imageView.setImageBitmap(imageBitmap);
+                break;
+
         }
     }
-
+    private File getFile() {
+        File image_file = new File(img_path);
+        return image_file;
+    }
     private void doOCR() {
         prepareTesseract();
         startOCR(convertColorIntoBlackAndWhiteImage(imageBitmap));
@@ -158,7 +203,7 @@ public class MainActivity extends AppCompatActivity{
         }catch (Exception e){
             Log.e(TAG, e.getMessage());
         }
-        tessBaseApi.init(DATA_PATH,lang);
+        tessBaseApi.init(Environment.getExternalStorageDirectory() + "/TesseractSample/",lang);
         tessBaseApi.setImage(bitmap);
         try {
             extractedText = tessBaseApi.getUTF8Text();
