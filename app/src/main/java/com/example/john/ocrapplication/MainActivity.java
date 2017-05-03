@@ -1,6 +1,5 @@
 package com.example.john.ocrapplication;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,7 +18,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
@@ -50,6 +47,7 @@ public class MainActivity extends AppCompatActivity{
     private static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/TesseractSample/";
     private static final String TESSDATA = "tessdata";
     private ProgressDialog mProgressDialog;
+    ImageProcessing imageProcessing = new ImageProcessing();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +90,7 @@ public class MainActivity extends AppCompatActivity{
                     try{
                         doOCR();
                     }catch (Exception e){
-                        Log.e(TAG,"This is the exception we are failling "+e.toString());
+                        Log.e(TAG,"This is the exception we are failing "+e.toString());
                         e.printStackTrace();
                     }
                 }
@@ -119,10 +117,10 @@ public class MainActivity extends AppCompatActivity{
                     imageView.setImageBitmap(imageBitmap);
 
                 } catch (FileNotFoundException e) {
-                    Log.e(TAG, "ERROR: Connot open image "+ e );
+                    Log.e(TAG, "ERROR: Cannot open image "+ e );
                 }
                 catch (IOException e){
-                    Log.e(TAG, "ERROR: Connot open image "+ e );
+                    Log.e(TAG, "ERROR: Cannot open image "+ e );
                 }
                 break;
             case CAM_REQUEST:
@@ -131,7 +129,6 @@ public class MainActivity extends AppCompatActivity{
                 imageBitmap = BitmapFactory.decodeFile(img_path);
                 imageView.setImageBitmap(imageBitmap);
                 break;
-
         }
     }
     private File getFile() {
@@ -213,9 +210,10 @@ public class MainActivity extends AppCompatActivity{
         tessBaseApi.end();
         return extractedText;
     }
+
     private void startOCR(final Bitmap bitmap) {
         if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(this, "Processing",
+            mProgressDialog = ProgressDialog.show(this, "Processing image",
                     "Please wait...", true);
         }
         else {
@@ -225,7 +223,6 @@ public class MainActivity extends AppCompatActivity{
             public void run() {
 
                 final String result = extractTextFromBitmap(bitmap).toLowerCase();
-
 
                 runOnUiThread(new Runnable() {
 
@@ -238,26 +235,22 @@ public class MainActivity extends AppCompatActivity{
                             imageView.setImageBitmap(bitmap);
 
                             Log.i(TAG, "S is "+s);
-
                         }
-
                         mProgressDialog.dismiss();
                     }
 
                 });
 
-            };
+            }
         }).start();
     }
-    private Bitmap convertColorIntoBlackAndWhiteImage(Bitmap orginalBitmap) {
+    private Bitmap convertColorIntoBlackAndWhiteImage(Bitmap originalBitmap) {
         ColorMatrix colorMatrix = new ColorMatrix();
         colorMatrix.setSaturation(0);
 
-        ColorMatrixColorFilter colorMatrixFilter = new ColorMatrixColorFilter(
-                colorMatrix);
+        ColorMatrixColorFilter colorMatrixFilter = new ColorMatrixColorFilter(colorMatrix);
 
-        Bitmap blackAndWhiteBitmap = orginalBitmap.copy(
-                Bitmap.Config.ARGB_8888, true);
+        Bitmap blackAndWhiteBitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
         Paint paint = new Paint();
         paint.setColorFilter(colorMatrixFilter);
