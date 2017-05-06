@@ -21,6 +21,11 @@ import android.widget.TextView;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
+import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -47,7 +52,6 @@ public class MainActivity extends AppCompatActivity{
     private static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/TesseractSample/";
     private static final String TESSDATA = "tessdata";
     private ProgressDialog mProgressDialog;
-    ImageProcessing imageProcessing = new ImageProcessing();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +62,10 @@ public class MainActivity extends AppCompatActivity{
         btnGallery = (Button) findViewById(R.id.btnGallery);
         btnConvert = (Button) findViewById(R.id.btnConvert);
         textView = (TextView) findViewById(R.id.textResult);
+
+        /*if (!OpenCVLoader.initDebug()) {
+            Log.e(TAG,"Failed to start open cv ");
+        }*/
 
         if (btnCamera != null) {
             btnCamera.setOnClickListener(new View.OnClickListener() {
@@ -116,10 +124,7 @@ public class MainActivity extends AppCompatActivity{
                     imageBitmap = BitmapFactory.decodeFile(img_path);
                     imageView.setImageBitmap(imageBitmap);
 
-                } catch (FileNotFoundException e) {
-                    Log.e(TAG, "ERROR: Cannot open image "+ e );
-                }
-                catch (IOException e){
+                } catch (IOException e){
                     Log.e(TAG, "ERROR: Cannot open image "+ e );
                 }
                 break;
@@ -132,8 +137,7 @@ public class MainActivity extends AppCompatActivity{
         }
     }
     private File getFile() {
-        File image_file = new File(img_path);
-        return image_file;
+        return new File(img_path);
     }
     private void doOCR() {
         prepareTesseract();
@@ -258,6 +262,12 @@ public class MainActivity extends AppCompatActivity{
         Canvas canvas = new Canvas(blackAndWhiteBitmap);
         canvas.drawBitmap(blackAndWhiteBitmap, 0, 0, paint);
 
+        /*Mat imageMat = new Mat();
+        Utils.bitmapToMat(originalBitmap, imageMat);
+        Imgproc.cvtColor(imageMat, imageMat, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.medianBlur(imageMat, imageMat, 3);
+        Imgproc.threshold(imageMat, imageMat, 0, 255, Imgproc.THRESH_OTSU);
+        Utils.matToBitmap(imageMat,blackAndWhiteBitmap);*/
         return blackAndWhiteBitmap;
     }
 }
