@@ -261,6 +261,15 @@ public class MainActivity extends AppCompatActivity{
 
         Canvas canvas = new Canvas(blackAndWhiteBitmap);
         canvas.drawBitmap(blackAndWhiteBitmap, 0, 0, paint);
+        /*****************************************************
+         * Title: How to use OpenCV to process image so that the text become sharp and clear?
+         * Author: Bruce
+         * Site owner/sponsor: stackoverflow.com
+         * Date: 2013
+         * Code version: edited Jul 28 '13 at 16:22
+         * Availability: http://stackoverflow.com/questions/17874149/how-to-use-opencv-to-process-image-so-that-the-text-become-sharp-and-clear
+         (Accessed 04 May 2017)
+         *****************************************************/
 
         /*Mat imageMat = new Mat();
         Utils.bitmapToMat(originalBitmap, imageMat);
@@ -268,6 +277,7 @@ public class MainActivity extends AppCompatActivity{
         Imgproc.medianBlur(imageMat, imageMat, 3);
         Imgproc.threshold(imageMat, imageMat, 0, 255, Imgproc.THRESH_OTSU);
         Utils.matToBitmap(imageMat,blackAndWhiteBitmap);*/
+        //End of [non-original or refactored] code
         return blackAndWhiteBitmap;
     }
 }
