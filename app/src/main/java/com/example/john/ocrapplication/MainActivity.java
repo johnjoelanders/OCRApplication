@@ -1,6 +1,7 @@
 package com.example.john.ocrapplication;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,12 +13,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
@@ -44,7 +45,6 @@ public class MainActivity extends AppCompatActivity{
     String extractedText;
     Bitmap imageBitmap;
     private TessBaseAPI tessBaseApi;
-    TextView textView;
     static final int CAM_REQUEST = 1;
     static final int GALLERY_REQUEST = 2;
     String IMGS_PATH = Environment.getExternalStorageDirectory().toString() + "/TesseractSample/imgs";
@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity{
         btnCamera = (Button) findViewById(R.id.btnOpenCamera);
         btnGallery = (Button) findViewById(R.id.btnGallery);
         btnConvert = (Button) findViewById(R.id.btnConvert);
-        textView = (TextView) findViewById(R.id.textResult);
 
         /*if (!OpenCVLoader.initDebug()) {
             Log.e(TAG,"Failed to start open cv ");
@@ -234,7 +233,20 @@ public class MainActivity extends AppCompatActivity{
                     public void run() {
                         if (result != null && !result.equals("")) {
                             String s = result.trim();
-                            textView.setText(result);
+                            AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+                            builder1.setMessage("Text detected: "+result);
+                            builder1.setCancelable(true);
+
+                            builder1.setPositiveButton(
+                                    "Close",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+
+                            AlertDialog alert11 = builder1.create();
+                            alert11.show();
 
                             imageView.setImageBitmap(bitmap);
 
